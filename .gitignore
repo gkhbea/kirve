@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Build & Dist Outputs (PyInstaller)
+build/
+dist/
+*.manifest
+
+# Audio & Temporary Files
+*.mp3
+*.wav
+*.tmp
+.kirve_tmp/
+
+# SQLite databases & runtime storage
+*.db
+*.db-journal
+*.sqlite
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini

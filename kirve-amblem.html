@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kirve</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes espin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.er{transform-origin:400px 400px;animation:espin 60s linear infinite}
+</style>
+
+<style>body{background:#0A1433;display:flex;justify-content:center}</style>
+</head>
+<body>
+
+<div style="width: 800px; height: 800px; box-sizing: border-box; position: relative; overflow: hidden; background: #0A1433; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 64px; gap: 14px; font-family: 'DM Sans', sans-serif;">
+<svg width="800" height="800" viewBox="0 0 800 800" aria-hidden="true" style="position: absolute; left: 0; top: 0;">
+<g class="er">
+<circle cx="400" cy="360" r="300" fill="none" stroke="#FFC93C" stroke-width="140" stroke-dasharray="3 22" opacity="0.18"/>
+</g>
+<circle cx="400" cy="360" r="250" fill="none" stroke="#1B2C66" stroke-width="2"/>
+<circle cx="400" cy="360" r="215" fill="none" stroke="#FFC93C" stroke-width="2" stroke-dasharray="90 30" opacity="0.7"/>
+<circle cx="400" cy="360" r="190" fill="#111F4D" stroke="#FFC93C" stroke-width="3"/>
+<g stroke="#FFC93C" stroke-width="14" stroke-linecap="round">
+<line x1="260" y1="336" x2="260" y2="384"/>
+<line x1="288" y1="308" x2="288" y2="412"/>
+<line x1="316" y1="276" x2="316" y2="444"/>
+<line x1="344" y1="300" x2="344" y2="420"/>
+<line x1="372" y1="248" x2="372" y2="472"/>
+<line x1="400" y1="210" x2="400" y2="510" stroke="#F6F1DC"/>
+<line x1="428" y1="248" x2="428" y2="472"/>
+<line x1="456" y1="300" x2="456" y2="420"/>
+<line x1="484" y1="276" x2="484" y2="444"/>
+<line x1="512" y1="308" x2="512" y2="412"/>
+<line x1="540" y1="336" x2="540" y2="384"/>
+</g>
+</svg>
+<div style="position: relative; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 72px; letter-spacing: 18px; padding-left: 18px; color: #F6F1DC;">KİRVE</div>
+<div style="position: relative; font-size: 16px; letter-spacing: 4px; color: #FFC93C;">SESİNİ DİNLER · HER ZAMAN YANINDA</div>
+</div>
+
+</body>
+</html>
