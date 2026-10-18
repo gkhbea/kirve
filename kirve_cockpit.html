@@ -389,7 +389,7 @@ header {
         </svg>
 
         <div class="greeting-text">
-            <h2>Hoş geldin, patron.</h2>
+            <h2 id="hudGreeting">Hoş geldin, patron.</h2>
             <p>SESİNİ DİNLER · HER ZAMAN YANINDA</p>
             <div class="hud-meta-badge">
                 <span>● SISTEM AKTİF</span> | <span>ODAKLANMA DÖNGÜSÜ: DEVREDE</span> | <span>VEKTÖR: HAZIR</span>
@@ -685,6 +685,18 @@ function submitCmd() {
         log('KİRVE: Dinliyorum, isteğini yerel sistemler ve araçlarla işleme alıyorum.');
     }
 }
+
+function updateTimeGreeting() {
+    const h = new Date().getHours();
+    let salute = "İyi günler patron.";
+    if (h >= 5 && h < 12) salute = "Günaydın patron.";
+    else if (h >= 12 && h < 18) salute = "İyi günler patron.";
+    else if (h >= 18 && h < 23) salute = "İyi akşamlar patron.";
+    else salute = "İyi geceler patron.";
+    const el = document.getElementById('hudGreeting');
+    if (el) el.innerText = salute;
+}
+updateTimeGreeting();
 </script>
 
 </body>

@@ -37,7 +37,7 @@ class KirveHUDBridge(QObject):
 
         # Assistant States
         self._silent_mode = False
-        self._last_message = "Sistemler hazır ve çevrimiçi."
+        self._last_message = self.conversational.get_time_based_startup_greeting()
         self._status_indicator = "SİSTEM ÇEVRİMİÇİ ('KİRVE' DE DİNLEYEYİM)"
         self._is_listening = False
 
@@ -60,8 +60,8 @@ class KirveHUDBridge(QObject):
         QTimer.singleShot(900, self._auto_greet_and_listen)
 
     def _auto_greet_and_listen(self):
-        """Speaks the opening greeting and immediately engages hands-free microphone listening."""
-        greeting = "Sistemler hazır ve çevrimiçi. Senin için ne yapabilirim?"
+        """Speaks the time-aware opening greeting to patron and immediately engages hands-free microphone listening."""
+        greeting = self.conversational.get_time_based_startup_greeting()
         self._last_message = greeting
         self.messageReceived.emit(greeting)
         self.voice.speak(greeting, on_finished=self._on_speech_finished)

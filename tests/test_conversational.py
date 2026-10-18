@@ -93,6 +93,35 @@ class TestConversationalEngine(unittest.TestCase):
                 self.assertIn("Python", args[0])
                 self.assertTrue("google" in reply.lower() or "araştırdım" in reply.lower() or "python" in reply.lower())
 
+    def test_time_based_greeting_morning(self):
+        from kirve.conversational import get_time_based_greeting
+        g = get_time_based_greeting(hour=9)
+        self.assertTrue(g.startswith("Günaydın patron"))
+        self.assertIn("senin için ne yapabilirim", g.lower())
+
+    def test_time_based_greeting_afternoon(self):
+        from kirve.conversational import get_time_based_greeting
+        g = get_time_based_greeting(hour=14)
+        self.assertTrue(g.startswith("İyi günler patron"))
+        self.assertIn("senin için ne yapabilirim", g.lower())
+
+    def test_time_based_greeting_evening(self):
+        from kirve.conversational import get_time_based_greeting
+        g = get_time_based_greeting(hour=20)
+        self.assertTrue(g.startswith("İyi akşamlar patron"))
+        self.assertIn("senin için ne yapabilirim", g.lower())
+
+    def test_time_based_greeting_night(self):
+        from kirve.conversational import get_time_based_greeting
+        g = get_time_based_greeting(hour=2)
+        self.assertTrue(g.startswith("İyi geceler patron"))
+        self.assertIn("senin için ne yapabilirim", g.lower())
+
+    def test_startup_greeting_method(self):
+        startup_msg = self.engine.get_time_based_startup_greeting()
+        self.assertIn("patron", startup_msg.lower())
+        self.assertTrue(any(w in startup_msg for w in ["Günaydın", "İyi günler", "İyi akşamlar", "İyi geceler"]))
+
     def test_speech_cleaning(self):
         cleaned = self.engine._clean_for_speech("### **Merhaba** _sistem_ `[test]`")
         self.assertEqual(cleaned, "Merhaba sistem test")

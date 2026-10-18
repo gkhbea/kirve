@@ -11,6 +11,27 @@ from kirve.llm_adapter import OllamaAdapter
 from kirve.telemetry import SystemTelemetry
 from kirve.tools.research_agent import ResearchAgent
 
+def get_time_based_greeting(hour: Optional[int] = None, patron_name: str = "patron") -> str:
+    """
+    Returns an articulate, time-aware Turkish greeting addressing the patron based on local time.
+    - 05:00 - 11:59 -> Günaydın patron...
+    - 12:00 - 17:59 -> İyi günler patron...
+    - 18:00 - 22:59 -> İyi akşamlar patron...
+    - 23:00 - 04:59 -> İyi geceler patron...
+    """
+    if hour is None:
+        from datetime import datetime
+        hour = datetime.now().hour
+
+    if 5 <= hour < 12:
+        return f"Günaydın {patron_name}, sistemler hazır ve seni dinliyorum. Senin için ne yapabilirim?"
+    elif 12 <= hour < 18:
+        return f"İyi günler {patron_name}, tüm sistemler çevrimiçi. Senin için ne yapabilirim?"
+    elif 18 <= hour < 23:
+        return f"İyi akşamlar {patron_name}, tüm sistemler aktif ve hazır. Senin için ne yapabilirim?"
+    else:
+        return f"İyi geceler {patron_name}, sistemler devrede ve seni dinliyorum. Senin için ne yapabilirim?"
+
 class ConversationalEngine:
     """
     JARVIS-style thoughtful AI assistant engine for KİRVE.
@@ -21,6 +42,10 @@ class ConversationalEngine:
         self.ollama = ollama_adapter or OllamaAdapter()
         self.telemetry = SystemTelemetry()
         self.research_agent = ResearchAgent(headless=True)
+
+    def get_time_based_startup_greeting(self, hour: Optional[int] = None) -> str:
+        """Helper to retrieve startup greeting addressing patron based on current hour."""
+        return get_time_based_greeting(hour=hour, patron_name="patron")
 
     def get_commentary_and_reply(
         self,
@@ -245,17 +270,28 @@ class ConversationalEngine:
         # 1. Greetings & Well-being
         if any(w in low for w in ["nasılsın", "ne haber", "naber", "nasıl gidiyor", "keyifler", "durumlar"]):
             options = [
-                "Gayet iyiyim, teşekkür ederim. Sistemler stabil çalışıyor ve tüm telemetriyi izliyorum. Senin günün nasıl geçiyor?",
-                "Harika bir noktadayız. Donanım serin, ağ bağlantısı pürüzsüz. Aklında bir plan varsa hemen üzerinde çalışabiliriz.",
-                "Oldukça zindeyim. Arka plandaki tüm süreçleri kontrol altında tutuyorum. Bugün seninle üretken bir çalışma yapmak için hazırım."
+                "Gayet iyiyim patron, teşekkür ederim. Sistemler stabil çalışıyor ve tüm telemetriyi izliyorum. Senin günün nasıl geçiyor?",
+                "Harika bir noktadayız patron. Donanım serin, ağ bağlantısı pürüzsüz. Aklında bir plan varsa hemen üzerinde çalışabiliriz.",
+                "Oldukça zindeyim patron. Arka plandaki tüm süreçleri kontrol altında tutuyorum. Bugün seninle üretken bir çalışma yapmak için hazırım."
             ]
             return random.choice(options)
 
-        if any(w in low for w in ["merhaba", "selam", "günaydın", "iyi akşamlar", "kolay gelsin"]):
+        if any(w in low for w in ["merhaba", "selam", "günaydın", "iyi günler", "iyi akşamlar", "iyi aksamlar", "iyi geceler", "kolay gelsin"]):
+            from datetime import datetime
+            h = datetime.now().hour
+            if 5 <= h < 12:
+                salute = "Günaydın patron"
+            elif 12 <= h < 18:
+                salute = "İyi günler patron"
+            elif 18 <= h < 23:
+                salute = "İyi akşamlar patron"
+            else:
+                salute = "İyi geceler patron"
+
             options = [
-                "Merhaba, hoş geldin. Sesini duymak güzel; bugün senin için ne yapabilirim?",
-                "Selamlar. Tüm sistemler hazır ve dinlemedeyim. Bir gelişme var mı?",
-                "İyi günler. Ekosistemin tüm parçaları aktif. Seni dinliyorum."
+                f"{salute}. Hoş geldin, sesini duymak güzel; bugün senin için ne yapabilirim?",
+                f"{salute}. Tüm sistemler hazır ve dinlemedeyim. Bir gelişme veya araştırma isteğin var mı?",
+                f"{salute}. Ekosistemin tüm parçaları aktif. Seni dinliyorum."
             ]
             return random.choice(options)
 

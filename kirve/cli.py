@@ -196,7 +196,9 @@ class KirveCLI:
     def run(self) -> None:
         """Starts the interactive CLI loop."""
         self.render_banner()
-        print(f"{CYAN}KİRVE:{RESET} Emrindeyim patron, sistem hazır. Ne yapıyoruz?\n")
+        from kirve.conversational import get_time_based_greeting
+        greeting = get_time_based_greeting()
+        print(f"{CYAN}KİRVE:{RESET} {greeting}\n")
         
         while True:
             try:
