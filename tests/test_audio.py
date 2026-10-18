@@ -22,14 +22,14 @@ class TestVoiceEngine(unittest.TestCase):
         self.assertTrue(res)
 
     def test_simulate_voice_command(self):
-        cmd = self.engine.simulate_voice_command("Togg şarj durumunu göster")
-        self.assertEqual(cmd, "Togg şarj durumunu göster")
+        cmd = self.engine.simulate_voice_command("Sistem durumunu göster")
+        self.assertEqual(cmd, "Sistem durumunu göster")
 
     def test_listen_and_transcribe_mock(self):
         with patch.object(self.engine, "record_microphone_wav", return_value=True), \
-             patch.object(self.engine, "transcribe_audio_file", return_value="Togg klimasını aç"):
+             patch.object(self.engine, "transcribe_audio_file", return_value="En ucuz nutellayı bul"):
             text = self.engine.listen_and_transcribe(duration_seconds=0.1)
-            self.assertEqual(text, "Togg klimasını aç")
+            self.assertEqual(text, "En ucuz nutellayı bul")
 
     def test_transcribe_missing_model_graceful_error(self):
         with patch.object(self.engine, "_get_whisper_model", return_value=None):

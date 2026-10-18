@@ -12,12 +12,6 @@ from kirve.llm_adapter import OllamaAdapter
 from kirve.tools.security import default_security_agent
 from kirve.tools.system_control import SystemControlTool
 from kirve.tools.research_agent import ResearchAgent
-from kirve.tools.ev_otomasyon import (
-    EvOtomasyonAraci,
-    ToggClimateRequest,
-    ToggLockRequest,
-    RoborockCleanRequest
-)
 from kirve.memory_vector import VectorMemory
 from kirve.focus_monitor import FocusMonitor
 from kirve.event_bus import default_event_bus
@@ -52,7 +46,6 @@ class KirveCLI:
         self.security = default_security_agent
         self.system_control = SystemControlTool(security_agent=self.security)
         self.research_agent = ResearchAgent(security_agent=self.security)
-        self.ev_otomasyon = EvOtomasyonAraci(memory=self.memory)
         self.event_bus = default_event_bus
         self.focus_monitor = FocusMonitor(event_bus=self.event_bus)
         self.focus_monitor.start_monitoring()
@@ -116,7 +109,6 @@ class KirveCLI:
             print(f"\n{CYAN}KİRVE:{RESET} Görüşmek üzere patron, sistem beklemede.")
             self.focus_monitor.stop_monitoring()
             self.research_agent.close()
-            self.ev_otomasyon.close()
             sys.exit(0)
         elif c in ["/durum", "/status"]:
             self.show_status()
@@ -146,86 +138,6 @@ class KirveCLI:
             return True
         elif c in ["/gecmis", "/history"]:
             self.show_history(limit=10)
-            return True
-        elif c.startswith("/togg"):
-            parts = raw.split()
-            if len(parts) > 1:
-                sub = parts[1].lower()
-                if sub in ["sarj", "şarj"]:
-                    action = parts[2].lower() if len(parts) > 2 else "baslat"
-                    start = action in ["baslat", "başlat", "start", "ac", "aç", "1"]
-                    res = self.ev_otomasyon.set_togg_charging(start)
-                    print(f"{GREEN}KİRVE:{RESET} {res['message']}\n")
-                    return True
-                elif sub in ["klima"]:
-                    temp = float(parts[2]) if len(parts) > 2 else 22.0
-                    res = self.ev_otomasyon.send_togg_climate_request(ToggClimateRequest(vin="TR-TOGG-01", action="START", target_temperature_c=temp))
-                    print(f"{GREEN}KİRVE:{RESET} {res.message}\n")
-                    return True
-                elif sub in ["kilitle", "kilit"]:
-                    lock_state = False if (len(parts) > 2 and parts[2].lower() in ["ac", "aç", "open"]) else True
-                    res = self.ev_otomasyon.send_togg_lock_request(ToggLockRequest(vin="TR-TOGG-01", lock=lock_state))
-                    print(f"{GREEN}KİRVE:{RESET} {res.message}\n")
-                    return True
-
-            togg = self.ev_otomasyon.get_togg_status()
-            if togg["success"]:
-                telem = togg["telemetry"]
-                charge_str = f"{GREEN}Şarj Oluyor ({telem['charging_power_kw']} kW){RESET}" if telem["is_charging"] else f"{DIM}Şarjda Değil{RESET}"
-                print(f"\n{BOLD}--- Togg T10X Durumu ---{RESET}")
-                print(f"• Batarya: %{telem['battery_percentage']} | Kalan Menzil: {telem['range_km']} km")
-                print(f"• Şarj Durumu: {charge_str}")
-                print(f"• Kapılar: {'Kilitli' if telem['doors_locked'] else 'Açık'} | Klima: {'Açık' if telem['climate_active'] else 'Kapalı'}\n")
-            else:
-                print(f"{YELLOW}KİRVE:{RESET} {togg['message']}\n")
-            return True
-        elif c.startswith("/roborock"):
-            parts = raw.split()
-            if len(parts) > 1 and parts[1].lower() == "temizle":
-                zone = parts[2] if len(parts) > 2 else "Salon"
-                res = self.ev_otomasyon.send_roborock_clean_request(RoborockCleanRequest(device_id="RR-Q8", command="clean_zone", zone_name=zone))
-                print(f"{GREEN}KİRVE:{RESET} {res.message}\n")
-            elif len(parts) > 1 and parts[1].lower() == "dock":
-                res = self.ev_otomasyon.dock_roborock()
-                print(f"{GREEN}KİRVE:{RESET} {res['message']}\n")
-            else:
-                rr = self.ev_otomasyon.get_roborock_status()
-                if rr["success"]:
-                    telem = rr["telemetry"]
-                    lidar_str = f"{GREEN}Aktif ({telem['lidar_status']}){RESET}" if telem['lidar_status'] == "OK" else f"{RED}Uyarı: {telem['lidar_status']}{RESET}"
-                    print(f"\n{BOLD}--- Roborock Q8 Durumu ---{RESET}")
-                    print(f"• LiDAR Sensörü: {lidar_str}")
-                    print(f"• Batarya: %{telem['battery_percentage']} | Durum: {telem['cleaning_state']}")
-                    print(f"• Son Temizlik: {telem['cleaned_area_m2']} m² ({telem['cleaning_time_minutes']} dk)\n")
-                else:
-                    print(f"{YELLOW}KİRVE:{RESET} {rr['message']}\n")
-            return True
-        elif c.startswith("/ev"):
-            parts = raw.split()
-            if len(parts) > 2 and parts[1].lower() in ["ac", "aç", "on"]:
-                dev_id = parts[2].lower()
-                res = self.ev_otomasyon.control_home_device(dev_id, "turn_on")
-                msg = f"{dev_id} açıldı patron." if res["success"] else f"Hata: {res['message']}"
-                print(f"{GREEN}KİRVE:{RESET} {msg}\n")
-                return True
-            elif len(parts) > 2 and parts[1].lower() in ["kapat", "off"]:
-                dev_id = parts[2].lower()
-                res = self.ev_otomasyon.control_home_device(dev_id, "turn_off")
-                msg = f"{dev_id} kapatıldı patron." if res["success"] else f"Hata: {res['message']}"
-                print(f"{GREEN}KİRVE:{RESET} {msg}\n")
-                return True
-
-            devices = self.ev_otomasyon.list_home_devices()
-            retry_tasks = self.ev_otomasyon.get_retry_status()
-            print(f"\n{BOLD}--- Google Home Cihazları ---{RESET}")
-            for d in devices:
-                status = f"{GREEN}Açık{RESET}" if d["state"].get("on") else f"{DIM}Kapalı{RESET}"
-                print(f"• [{d['device_id']}] {d['name']} ({d['room']}): {status}")
-            if retry_tasks:
-                print(f"\n{YELLOW}Arka Planda Yeniden Denenen Cihazlar (Timeout / Retry):{RESET}")
-                for r in retry_tasks:
-                    print(f"• {r['device_name']}: Deneme {r['current_retry']}/{r['max_retries']} (Son Hata: {r['last_error']})")
-            print()
             return True
         elif c in ["/sepet", "/cart"]:
             cart = self.research_agent.get_cart()

@@ -50,7 +50,7 @@ class TestResearchAgent(unittest.TestCase):
         sec_agent = SecurityAgent(input_provider=lambda p: "h")
         agent = ResearchAgent(security_agent=sec_agent, headless=True)
 
-        agent.add_to_cart({"product_name": "Togg Aksesuar", "price": 1200.0}, quantity=2)
+        agent.add_to_cart({"product_name": "Nutella 1000g", "price": 280.0}, quantity=2)
 
         res = agent.checkout()
         self.assertFalse(res["success"])
@@ -63,13 +63,13 @@ class TestResearchAgent(unittest.TestCase):
         sec_agent = SecurityAgent(input_provider=lambda p: "e")
         agent = ResearchAgent(security_agent=sec_agent, headless=True)
 
-        agent.add_to_cart({"product_name": "Togg Aksesuar", "price": 1200.0}, quantity=1)
+        agent.add_to_cart({"product_name": "Nutella 1000g", "price": 280.0}, quantity=1)
 
         res = agent.checkout()
         self.assertTrue(res["success"])
         self.assertTrue(res.get("approved_by_patron", False))
         self.assertIn("order_id", res)
-        self.assertEqual(res["paid_amount"], 1200.0)
+        self.assertEqual(res["paid_amount"], 280.0)
         # Cart must be cleared after successful checkout
         self.assertEqual(agent.get_cart()["total_items"], 0)
 

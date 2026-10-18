@@ -33,15 +33,15 @@ class TestEmbeddingEngine(unittest.TestCase):
         self.assertAlmostEqual(EmbeddingEngine.cosine_similarity(v1, v3), 0.0, places=5)
 
     def test_semantic_clustering(self):
-        vec_togg_1 = self.engine.embed_text("Togg T10X elektrikli otomobil şarjı")
-        vec_togg_2 = self.engine.embed_text("Togg batarya doluluk oranı ve şarj istasyonu")
+        vec_tech_1 = self.engine.embed_text("Yapay zeka sinir ağları ve derin öğrenme modelleri")
+        vec_tech_2 = self.engine.embed_text("Makine öğrenimi algoritmaları ve veri analizi")
         vec_recipe = self.engine.embed_text("Fırında karnıyarık yemeği tarifi ve malzemeleri")
 
-        sim_togg = EmbeddingEngine.cosine_similarity(vec_togg_1, vec_togg_2)
-        sim_diff = EmbeddingEngine.cosine_similarity(vec_togg_1, vec_recipe)
+        sim_tech = EmbeddingEngine.cosine_similarity(vec_tech_1, vec_tech_2)
+        sim_diff = EmbeddingEngine.cosine_similarity(vec_tech_1, vec_recipe)
 
         # Related texts should have higher similarity than unrelated cooking recipe
-        self.assertGreater(sim_togg, sim_diff)
+        self.assertGreater(sim_tech, sim_diff)
 
     def test_embed_batch(self):
         texts = ["Birinci cümle", "İkinci cümle", "Üçüncü cümle"]

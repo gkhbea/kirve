@@ -10,7 +10,6 @@ class TestKirveCLI(unittest.TestCase):
 
     def tearDown(self):
         self.cli.focus_monitor.stop_monitoring()
-        self.cli.ev_otomasyon.close()
         self.cli.research_agent.close()
         self.cli.memory.close()
 

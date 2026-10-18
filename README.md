@@ -15,7 +15,7 @@ kirve-ai-os/
 │   ├── embedding.py          # Ollama / Hızlı anlamsal embedding katmanı (384-d)
 │   ├── event_bus.py          # Asenkron Pub/Sub olay yönetim mimarisi
 │   ├── focus_monitor.py      # Windows Win32 + pygetwindow tam ekran/oyun/toplantı izleyici
-│   ├── audio.py              # faster-whisper STT + pyttsx3 TTS (silent_mode duyarlı)
+│   ├── audio.py              # faster-whisper STT + Edge-TTS AhmetNeural & SAPI5 Tolga
 │   ├── network.py            # Hızlı soket tabanlı ağ/internet kontrolü
 │   ├── llm_adapter.py        # Ollama yerel LLM adaptörü ve offline fallback
 │   ├── cli.py                # Windows 10/11 uyumlu interaktif CLI arayüzü
@@ -23,10 +23,9 @@ kirve-ai-os/
 │       ├── __init__.py
 │       ├── security.py       # [E/H] zorunlu onay mekanizması (SecurityAgent)
 │       ├── system_control.py # Bilgisayar ve dosya kontrol aracı (os/subprocess)
-│       ├── research_agent.py # Web arama, fiyat toplama, sepet ve ödeme ajanı
-│       └── ev_otomasyon.py   # Google Home, Togg T10X, Roborock Q8 ve Arka Plan Retry
+│       └── research_agent.py # Web arama, fiyat toplama, sepet ve ödeme ajanı
 │
-├── tests/                    # 11 farklı test modülü ve 56+ birim testi
+├── tests/                    # 10 farklı test modülü ve 60+ birim testi
 ├── data/                     # SQLite yerel önbellek veritabanı (kirve_memory.db)
 ├── kirve_cockpit.html        # Fütüristik HUD & Kokpit Arayüzü
 ├── run.py                    # Başlatıcı script
@@ -46,13 +45,14 @@ kirve-ai-os/
 - **Tam Ekran Oyun & Toplantı Tespiti**: Valorant, CS2, Cyberpunk, Zoom, Teams, Discord gibi uygulamalar veya tam ekran algılandığında EventBus üzerinden `FULLSCREEN_ENTER` ve `SILENT_MODE_CHANGED` olaylarını tetikler.
 - **Otomatik `silent_mode=True`**: Sesli bildirimler ve konuşma (TTS) anında sessize alınır; odaklanmanız asla bozulmaz. Tam ekrandan çıkıldığında standart sesli moda otomatik dönülür.
 
+### 3. Eller Serbest "KİRVE" Wake-Word & Stüdyo Ses Tonu
+- **Kesintisiz Wake-Word**: Butona basmaya gerek kalmadan "Kirve" dendiği an mikrofon açılır.
+- **Ahmet Neural Ses Tonu**: Microsoft'un stüdyo netliğindeki Türkçe bariton erkek ses tonu (`tr-TR-AhmetNeural`) ve yerel `Microsoft Tolga` yedeği.
+
 ## CLI Komutları
 
 - `/odak`: Anlık aktif pencere, tam ekran durumu ve sessiz mod (DND) raporu.
 - `/vektor <arama>`: Geçmiş konuşmalar ve belgeler arasında pgvector semantik araması.
-- `/togg`: Togg T10X telemetrisi (`/togg sarj`, `/togg klima 22`, `/togg kilitle`).
-- `/roborock`: Roborock Q8 LiDAR durumu (`/roborock temizle Salon`, `/roborock dock`).
-- `/ev`: Google Home cihazları ve arka plan yeniden deneme (retry) kuyruğu.
 - `/arastir <urun>`, `/sepet`, `/ode`: E-ticaret araştırma ve güvenli onaylı ödeme.
 - `/durum`, `/gecmis`, `/temizle`, `/cikis`.
 

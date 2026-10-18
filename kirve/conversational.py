@@ -166,7 +166,7 @@ class ConversationalEngine:
             return "Ben KİRVE; senin dijital sağ kolun ve kişisel yapay zeka işletim sisteminim. Tıpkı JARVIS gibi sistemlerini yönetir, araştırmalar yapar, fikir üretir ve yanında olurum."
 
         if any(w in low for w in ["ne yapabilirsin", "yeteneklerin", "neler yaparsın", "yardım"]):
-            return "İnternette kapsamlı araştırmalar yapabilir, Togg ve Roborock gibi cihazlarını yönetebilir, donanım sağlığını izleyebilir ve aklındaki fikirler üzerine seninle beyin fırtınası yapabilirim."
+            return "İnternette otonom araştırmalar yapabilir, en uygun fiyatlı ürünleri bulup sitelerini açabilir, donanım sağlığını canlı izleyebilir ve aklındaki fikirler üzerine seninle beyin fırtınası yapabilirim."
 
         # 3. Commentary, Thoughts & Opinions ("Ne düşünüyorsun?", "Fikrin ne?", "Sence")
         if any(w in low for w in ["ne düşünüyorsun", "fikrin ne", "fikrini söyle", "sence nasıl", "yorum yap", "yorumun ne", "ne dersin"]):
@@ -177,16 +177,6 @@ class ConversationalEngine:
                 ram = int(snap["ram_percent"])
                 return f"Donanım durumunu inceledim. İşlemci yükü yüzde {cpu}, bellek kullanımı ise yüzde {ram} civarında. Bana kalırsa sistem oldukça dengeli ve serin çalışıyor; ağır iş yüklerine bile rahatlıkla girebilirsin."
 
-            # Togg opinion
-            if any(w in low for w in ["togg", "araba", "araç", "menzil", "şarj"]):
-                soc = ctx.get("togg_soc", 78)
-                rng = ctx.get("togg_range", 395)
-                return f"Togg T10X'in mevcut yüzde {soc} şarjı ve {rng} kilometre menzili gayet tatmin edici bir seviyede. Şehir içi rutini ya da beklenmedik bir şehir dışı seyahati rahatlıkla karşılar. Benim tavsiyem, akşam saatlerinde bataryayı yüzde 85-90 bandına tamamlamamız yönünde."
-
-            # Roborock opinion
-            if any(w in low for w in ["roborock", "süpürge", "robot", "temizlik", "ev"]):
-                return "Roborock Q8 LiDAR haritasıyla istasyonunda hazır bekliyor. Evin genel hijyeni ve ortam havası için salon veya sık kullanılan odalara hafif bir tur attırmak faydalı olur diye düşünüyorum."
-
             # Technology / AI / Future thoughts
             if any(w in low for w in ["yapay zeka", "gelecek", "teknoloji", "dünya"]):
                 return "Yapay zekanın geleceğini düşündüğümde, en kıymetli modelin insan zekasıyla yapay zekanın ortak ritmi olduğuna inanıyorum. Birlikte düşündüğümüzde hem zamanı hem de imkanları çok daha verimli yönetebiliriz."
@@ -194,28 +184,15 @@ class ConversationalEngine:
             # General philosophical or situational opinion
             return "Durumu etraflıca düşündüğümde, gidişatın oldukça lehimize olduğunu görüyorum. Veriler tutarlı, arka plan stabil. Senin hissin ne yönde?"
 
-        # 4. Togg Specific Status
-        if any(w in low for w in ["togg", "t10x", "araba"]):
-            soc = ctx.get("togg_soc", 78)
-            rng = ctx.get("togg_range", 395)
-            is_chg = ctx.get("togg_charging", False)
-            chg_str = "şarj ediliyor" if is_chg else "şarjda değil"
-            return f"Togg T10X bataryası yüzde {soc}, tahmini kalan menzilimiz {rng} kilometre. Araç şu anda {chg_str}."
-
-        # 5. Roborock Specific Status
-        if any(w in low for w in ["roborock", "süpürge", "temizlik"]):
-            return "Roborock Q8 istasyonda ve LiDAR sensörü devrede bekliyor. Temizlik başlatmak istersen tek kelimen yeterli."
-
-        # 6. Hardware & Performance Metrics
+        # 4. Hardware & Performance Metrics
         if any(w in low for w in ["ram", "cpu", "işlemci", "bellek", "donanım", "sıcaklık", "ağ"]):
             snap = self.telemetry.get_snapshot()
             return f"İşlemci yükü yüzde {int(snap['cpu_percent'])}, bellek kullanımı yüzde {int(snap['ram_percent'])}. Ağ indirme hızı {snap['net_download_kb_s']} kilobayt, yükleme ise {snap['net_upload_kb_s']} kilobayt seviyesinde."
 
-        # 7. Humor & Lighthearted Banter
+        # 5. Humor & Lighthearted Banter
         if any(w in low for w in ["fıkra", "şaka", "komik"]):
             jokes = [
                 "Bir yazılımcıya 'Markete git, 1 ekmek al; eğer yumurta varsa 10 tane al' demişler. Yazılımcı eve 10 ekmekle dönmüş, 'Çünkü yumurta vardı' demiş.",
-                "Roborock dün halıya çarpıp duraksadı. Sebebini sordum, 'Sistemin karizmasından yönümü şaşırdım' dedi.",
                 "Yapay zeka olmak bazen zor; dünyayı çözersin ama tek bir priz çekilmesine bakar tüm varlığın."
             ]
             return random.choice(jokes)

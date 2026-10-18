@@ -6,7 +6,6 @@ import sys
 from PySide6.QtCore import QObject, Signal, Slot, Property, QTimer
 from kirve.telemetry import SystemTelemetry
 from kirve.audio import VoiceEngine
-from kirve.tools.ev_otomasyon import EvOtomasyonAraci
 from kirve.focus_monitor import FocusMonitor
 from kirve.conversational import ConversationalEngine
 
@@ -25,7 +24,6 @@ class KirveHUDBridge(QObject):
         super().__init__(parent)
         self.telemetry = SystemTelemetry()
         self.voice = VoiceEngine()
-        self.automation = EvOtomasyonAraci()
         self.focus = FocusMonitor()
         self.conversational = ConversationalEngine()
 
@@ -37,11 +35,7 @@ class KirveHUDBridge(QObject):
         self._net_down = "0.0 KB/s"
         self._net_up = "0.0 KB/s"
 
-        # Device & Assistant States
-        self._togg_soc = 78
-        self._togg_range = 395
-        self._togg_charging = False
-        self._roborock_lidar = "OK (Aktif)"
+        # Assistant States
         self._silent_mode = False
         self._last_message = "Sistemler hazır ve çevrimiçi."
         self._status_indicator = "SİSTEM ÇEVRİMİÇİ ('KİRVE' DE DİNLEYEYİM)"
@@ -112,18 +106,6 @@ class KirveHUDBridge(QObject):
     @Property(str, notify=telemetryUpdated)
     def netUp(self):
         return self._net_up
-
-    @Property(int, notify=telemetryUpdated)
-    def toggSoc(self):
-        return self._togg_soc
-
-    @Property(int, notify=telemetryUpdated)
-    def toggRange(self):
-        return self._togg_range
-
-    @Property(str, notify=telemetryUpdated)
-    def roborockLidar(self):
-        return self._roborock_lidar
 
     @Property(bool, notify=telemetryUpdated)
     def silentMode(self):
@@ -203,23 +185,6 @@ class KirveHUDBridge(QObject):
             self._last_message = ack
             self.messageReceived.emit(ack)
             self.voice.speak(ack, on_finished=self._on_speech_finished)
-
-    @Slot()
-    def toggleToggCharging(self):
-        self._togg_charging = not self._togg_charging
-        state_str = "başlatıldı" if self._togg_charging else "durduruldu"
-        msg = f"Togg T10X şarjı {state_str}."
-        self._last_message = msg
-        self.messageReceived.emit(msg)
-        self.telemetryUpdated.emit()
-        self.voice.speak(msg)
-
-    @Slot(str)
-    def startRoborockZone(self, zone: str):
-        msg = f"Roborock Q8 '{zone}' bölgesinde temizliğe başladı."
-        self._last_message = msg
-        self.messageReceived.emit(msg)
-        self.voice.speak(msg)
 
     @Slot()
     def triggerVoiceInput(self):

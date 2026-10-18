@@ -204,28 +204,35 @@ Window {
 
                     Rectangle { Layout.fillWidth: true; height: 1; color: "#1B2C66" }
 
-                    // Togg T10X Mini Widget
+                    // Network & Focus Telemetry
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 6
+                        spacing: 8
                         Text {
-                            text: "TOGG T10X"
+                            text: "AĞ & İLETİŞİM"
                             font.family: "Rajdhani"
                             font.pixelSize: 14
                             font.bold: true
                             font.letterSpacing: 2
                             color: "#FFC93C"
                         }
-                        Text {
-                            text: "Batarya: %" + bridge.toggSoc + " · Menzil: " + bridge.toggRange + " km"
-                            font.family: "DM Sans"
-                            font.pixelSize: 12
-                            color: "#F6F1DC"
-                        }
-                        Button {
+                        RowLayout {
                             Layout.fillWidth: true
-                            text: "⚡ Şarjı Değiştir"
-                            onClicked: bridge.toggleToggCharging()
+                            Text { text: "İndirme (↓):"; font.family: "DM Sans"; font.pixelSize: 12; color: "#93A1CC" }
+                            Item { Layout.fillWidth: true }
+                            Text { text: bridge.netDown; font.family: "JetBrains Mono"; font.pixelSize: 12; font.bold: true; color: "#10B981" }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Text { text: "Yükleme (↑):"; font.family: "DM Sans"; font.pixelSize: 12; color: "#93A1CC" }
+                            Item { Layout.fillWidth: true }
+                            Text { text: bridge.netUp; font.family: "JetBrains Mono"; font.pixelSize: 12; font.bold: true; color: "#3B82F6" }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Text { text: "Sessiz Mod:"; font.family: "DM Sans"; font.pixelSize: 12; color: "#93A1CC" }
+                            Item { Layout.fillWidth: true }
+                            Text { text: bridge.silentMode ? "Aktif (DND)" : "Kapalı"; font.family: "DM Sans"; font.pixelSize: 12; font.bold: true; color: bridge.silentMode ? "#FFC93C" : "#93A1CC" }
                         }
                     }
 
@@ -351,7 +358,7 @@ Window {
                     spacing: 14
 
                     Text {
-                        text: "AKILLI EV & ROBOT"
+                        text: "OTONOM ASİSTAN"
                         font.family: "Rajdhani"
                         font.pixelSize: 15
                         font.bold: true
@@ -362,12 +369,12 @@ Window {
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 6
-                        Text { text: "ROBOROCK Q8"; font.family: "Rajdhani"; font.pixelSize: 14; font.bold: true; color: "#FFC93C" }
-                        Text { text: "LiDAR Sensörü: " + bridge.roborockLidar; font.family: "DM Sans"; font.pixelSize: 12; color: "#F6F1DC" }
+                        Text { text: "FİYAT & ARAŞTIRMA"; font.family: "Rajdhani"; font.pixelSize: 14; font.bold: true; color: "#FFC93C" }
+                        Text { text: "İnternette en ucuz ürünü bulur ve açar."; font.family: "DM Sans"; font.pixelSize: 12; color: "#F6F1DC" }
                         Button {
                             Layout.fillWidth: true
-                            text: "🧹 Salon Temizliğini Başlat"
-                            onClicked: bridge.startRoborockZone("Salon")
+                            text: "🔍 Nutella Fiyatı Araştır"
+                            onClicked: bridge.sendCommand("1 kg nutella nerede ucuz araştır")
                         }
                     }
 
@@ -376,16 +383,15 @@ Window {
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 8
-                        Text { text: "GÜVENLİK PROTOKOLÜ"; font.family: "Rajdhani"; font.pixelSize: 14; font.bold: true; color: "#FFC93C" }
-                        Text {
-                            text: "Kritik işlemlerde [E/H] onayı zorunludur."
-                            font.family: "DM Sans"
-                            font.pixelSize: 11
-                            color: "#93A1CC"
+                        Text { text: "GÜVENLİK & DURUM"; font.family: "Rajdhani"; font.pixelSize: 14; font.bold: true; color: "#FFC93C" }
+                        Button {
+                            Layout.fillWidth: true
+                            text: "📊 Sistem Durum Raporu (/durum)"
+                            onClicked: bridge.sendCommand("/durum")
                         }
                         Button {
                             Layout.fillWidth: true
-                            text: "💳 Ödeme Testi (/ode)"
+                            text: "💳 Güvenli Ödeme Testi (/ode)"
                             onClicked: bridge.sendCommand("/ode")
                         }
                     }
@@ -418,7 +424,7 @@ Window {
                     color: "#F6F1DC"
                     clip: true
                     Text {
-                        text: "Seni dinliyorum... (örneğin: '1 kg luk nutella en ucuz nerede araştır', '/togg', '/roborock')"
+                        text: "Seni dinliyorum... (örneğin: '1 kg luk nutella en ucuz nerede araştır', '/durum', '/arastir')"
                         font.family: "DM Sans"
                         font.pixelSize: 15
                         color: "#93A1CC"

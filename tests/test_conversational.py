@@ -23,15 +23,13 @@ class TestConversationalEngine(unittest.TestCase):
         self.assertTrue("işlemci" in reply.lower() or "ram" in reply.lower() or "donanım" in reply.lower())
         self.assertTrue("yüzde" in reply.lower() or "çalışıyor" in reply.lower())
 
-    def test_opinion_togg(self):
-        ctx = {"togg_soc": 85, "togg_range": 420, "togg_charging": False}
-        reply = self.engine.get_commentary_and_reply("Togg sence nasıl?", device_context=ctx)
-        self.assertIn("togg", reply.lower())
-        self.assertTrue("menzil" in reply.lower() or "batarya" in reply.lower())
+    def test_opinion_ai_future(self):
+        reply = self.engine.get_commentary_and_reply("Yapay zeka hakkında ne düşünüyorsun?")
+        self.assertTrue("yapay zeka" in reply.lower() or "modelin" in reply.lower())
 
-    def test_opinion_roborock(self):
-        reply = self.engine.get_commentary_and_reply("Süpürge hakkında fikrin ne?")
-        self.assertIn("roborock", reply.lower())
+    def test_capabilities_response(self):
+        reply = self.engine.get_commentary_and_reply("Neler yapabilirsin?")
+        self.assertTrue("araştırma" in reply.lower() or "donanım" in reply.lower())
 
     def test_cheapest_nutella_and_open_browser(self):
         with patch("webbrowser.open", return_value=True) as mock_open:

@@ -428,53 +428,38 @@ header {
             </div>
         </div>
 
-        <!-- Column 2: AKILLI CİHAZLAR & EV -->
+        <!-- Column 2: OTONOM ASİSTAN & ARAŞTIRMA -->
         <div class="hud-col">
-            <div class="col-heading">EV VE CİHAZLAR</div>
+            <div class="col-heading">OTONOM ASİSTAN & ARAŞTIRMA</div>
 
-            <!-- Togg T10X Widget -->
-            <div class="vehicle-widget">
-                <div class="vehicle-header">
-                    <span style="font-size: 16px; font-weight: 700;">Togg T10X Telemetri</span>
-                    <span id="toggChargeBadge" style="font-size: 11px; font-weight: 700; color: var(--gold);">BAĞLI</span>
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div class="card-title">Hızlı Fiyat & Ürün Araştırma</div>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--gold);">OTONOM WEB</span>
                 </div>
-                <div class="stat-row">
-                    <span style="color: var(--text-dim); font-size: 13px;">Batarya / Menzil</span>
-                    <span style="font-weight: 700; color: var(--gold);">%78 · 395 km</span>
-                </div>
-                <div class="stat-row">
-                    <span style="color: var(--text-dim); font-size: 13px;">Şarj Gücü</span>
-                    <span id="toggPowerVal" style="font-weight: 600;">0.0 kW (Şarjda Değil)</span>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button class="btn-pill" id="btnCharge" onclick="toggleCharge()">⚡ Şarj Başlat (22kW)</button>
-                    <button class="btn-pill" onclick="sendClimate()">❄ Klima 22°C</button>
+                <div class="card-desc">İnternette en ucuz ürünü tespit eder ve doğrudan satın alma sayfasını tarayıcınızda açar.</div>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    <button class="btn-pill active" onclick="searchSample('1 kg nutella nerede en ucuz')">🔍 1 kg Nutella Araştır</button>
+                    <button class="btn-pill" onclick="searchSample('iPhone 15 en uygun fiyat')">📱 iPhone 15 Araştır</button>
                 </div>
             </div>
 
-            <!-- Roborock Q8 Widget with Radar -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div class="card-title">Eller Serbest "KİRVE" Uyandırma</div>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--emerald);">AKTİF</span>
+                </div>
+                <div class="card-desc">Mikrofona dokunmadan sadece "Kirve" veya "Hey Kirvem" diyerek doğrudan sesli komut verebilirsiniz.</div>
+            </div>
+
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div class="card-title">Roborock Q8 (LiDAR Radar)</div>
-                    <span id="rrState" style="font-size: 11px; font-weight: 700; color: var(--gold);">DOKTA (%94)</span>
+                    <div>
+                        <div class="card-title">Microsoft Ahmet Neural Sesi</div>
+                        <div class="card-desc">Doğal, tok ve bariton Türkçe konuşma sentezi</div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--gold);">STÜDYO SES</span>
                 </div>
-                <div class="radar-box">
-                    <canvas id="radarCanvas"></canvas>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: var(--text-dim);">
-                    <span>LiDAR: <b style="color: var(--emerald);">OK</b></span>
-                    <span>Temizlenen: <b>42.5 m²</b></span>
-                    <button class="btn-pill" onclick="startZoneClean('Salon')">🧹 Salon Temizle</button>
-                </div>
-            </div>
-
-            <!-- Google Home Device Row -->
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div class="card-title">Google Home</div>
-                    <div class="card-desc">Salon Aydınlatması, Termostat, Prizler</div>
-                </div>
-                <button class="btn-pill active" onclick="toggleLights()">💡 Işıkları Değiştir</button>
             </div>
         </div>
 
@@ -587,37 +572,9 @@ function renderRadar() {
 renderRadar();
 
 // Actions
-let charging = false;
-function toggleCharge() {
-    charging = !charging;
-    const btn = document.getElementById('btnCharge');
-    const power = document.getElementById('toggPowerVal');
-    const badge = document.getElementById('toggChargeBadge');
-    if (charging) {
-        btn.innerText = '⏹ Şarjı Durdur';
-        power.innerHTML = '<span style="color: var(--gold);">22.0 kW AC (Şarj Oluyor)</span>';
-        badge.innerText = 'ŞARJ EDİLİYOR';
-        log('KİRVE: Togg T10X 22 kW ile şarj edilmeye başlandı patron.');
-    } else {
-        btn.innerText = '⚡ Şarj Başlat (22kW)';
-        power.innerText = '0.0 kW (Şarjda Değil)';
-        badge.innerText = 'BAĞLI';
-        log('KİRVE: Togg T10X şarjı durduruldu patron.');
-    }
-}
-
-function sendClimate() {
-    log('KİRVE: Togg T10X kliması 22°C ayarına getirildi patron.');
-}
-
-function startZoneClean(zone) {
-    isScanning = true;
-    document.getElementById('rrState').innerText = 'TEMİZLİKTE (' + zone + ')';
-    log('KİRVE: Roborock Q8 ' + zone + ' bölgesinde LiDAR temizliğine başladı patron.');
-}
-
-function toggleLights() {
-    log('KİRVE: Google Home ışık durumu güncellendi patron.');
+function searchSample(q) {
+    document.getElementById('cmdInput').value = q;
+    submitCmd();
 }
 
 function confirmSecurity(approved) {
