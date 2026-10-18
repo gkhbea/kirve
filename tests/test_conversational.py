@@ -48,10 +48,50 @@ class TestConversationalEngine(unittest.TestCase):
                 {"title": "Hava Durumu İstanbul", "snippet": "İstanbul genelinde hava parçalı bulutlu ve 21 derece."}
             ]
         }
-        with patch.object(self.engine.research_agent, "search_web", return_value=fake_results):
-            reply = self.engine.get_commentary_and_reply("İstanbul hava durumunu araştır bakalım")
-            self.assertTrue(any(w in reply.lower() for w in ["araştırdım", "bulgulara", "kaynakları"]))
-            self.assertTrue("bulutlu" in reply.lower() or "derece" in reply.lower())
+        with patch.object(self.engine.research_agent, "open_in_foreground_browser", return_value=True):
+            with patch.object(self.engine.research_agent, "search_web", return_value=fake_results):
+                reply = self.engine.get_commentary_and_reply("İstanbul hava durumunu araştır bakalım")
+                self.assertTrue(any(w in reply.lower() for w in ["araştırdım", "bulgulara", "kaynakları"]))
+                self.assertTrue("bulutlu" in reply.lower() or "derece" in reply.lower())
+
+    def test_directive_google_search_rule(self):
+        reply = self.engine.get_commentary_and_reply("sana soru sordugumda google arastır")
+        self.assertTrue("google" in reply.lower())
+        self.assertTrue("soru" in reply.lower())
+        self.assertTrue("anlaşıldı" in reply.lower() or "araştırma" in reply.lower())
+
+    def test_question_triggers_google_search_and_browser(self):
+        fake_results = {
+            "success": True,
+            "results": [
+                {"title": "Galatasaray Maç Takvimi", "snippet": "Galatasaray maçı Pazar günü saat 19:00'da oynanacak."}
+            ]
+        }
+        with patch.object(self.engine.research_agent, "open_in_foreground_browser", return_value=True) as mock_open:
+            with patch.object(self.engine.research_agent, "search_web", return_value=fake_results):
+                reply = self.engine.get_commentary_and_reply("Galatasaray maçı ne zaman?")
+                mock_open.assert_called_once()
+                args, _ = mock_open.call_args
+                self.assertIn("google.com/search?q=", args[0])
+                self.assertIn("Galatasaray", args[0])
+                self.assertTrue("google" in reply.lower() or "araştırdım" in reply.lower())
+                self.assertTrue("pazar" in reply.lower() or "oynanacak" in reply.lower() or "açtım" in reply.lower())
+
+    def test_interrogative_without_question_mark_triggers_google(self):
+        fake_results = {
+            "success": True,
+            "results": [
+                {"title": "Python Programlama", "snippet": "Python yüksek seviyeli, genel amaçlı bir programlama dilidir."}
+            ]
+        }
+        with patch.object(self.engine.research_agent, "open_in_foreground_browser", return_value=True) as mock_open:
+            with patch.object(self.engine.research_agent, "search_web", return_value=fake_results):
+                reply = self.engine.get_commentary_and_reply("Python nedir")
+                mock_open.assert_called_once()
+                args, _ = mock_open.call_args
+                self.assertIn("google.com/search?q=", args[0])
+                self.assertIn("Python", args[0])
+                self.assertTrue("google" in reply.lower() or "araştırdım" in reply.lower() or "python" in reply.lower())
 
     def test_speech_cleaning(self):
         cleaned = self.engine._clean_for_speech("### **Merhaba** _sistem_ `[test]`")
