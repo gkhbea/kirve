@@ -15,6 +15,7 @@ from kirve.tools.research_agent import ResearchAgent
 from kirve.memory_vector import VectorMemory
 from kirve.focus_monitor import FocusMonitor
 from kirve.event_bus import default_event_bus
+from kirve.conversational import ConversationalEngine
 
 # ANSI Color codes for Windows 10/11 Terminal
 CYAN = "\033[96m"
@@ -47,6 +48,7 @@ class KirveCLI:
         self.system_control = SystemControlTool(security_agent=self.security)
         self.research_agent = ResearchAgent(security_agent=self.security)
         self.event_bus = default_event_bus
+        self.conversational = ConversationalEngine(ollama_adapter=self.adapter)
         self.focus_monitor = FocusMonitor(event_bus=self.event_bus)
         self.focus_monitor.start_monitoring()
         
@@ -238,23 +240,20 @@ class KirveCLI:
                 
                 print(f"{DIM}[Düşünüyor...]{RESET}", end="\r")
                 
-                # Query local LLM adapter with fallback protection
-                response = self.adapter.generate_response(
-                    prompt=user_input,
+                # Process via ConversationalEngine (handles questions, sports broadcasts, web research, and Ollama)
+                reply_content = self.conversational.get_commentary_and_reply(
+                    user_text=user_input,
                     history=recent_history
                 )
                 
                 # Clear thinking indicator
                 print(" " * 20, end="\r")
                 
-                reply_content = response["content"]
-                
                 # Display response
-                prefix = f"{GREEN}KİRVE:{RESET}" if response["success"] else f"{YELLOW}KİRVE (Sistem/Fallback):{RESET}"
-                print(f"{prefix} {reply_content}\n")
+                print(f"{GREEN}KİRVE:{RESET} {reply_content}\n")
                 
                 # Save assistant response to SQLite and Vector memory
-                meta = {"local": response.get("is_local"), "success": response.get("success")}
+                meta = {"source": "conversational_engine", "success": True}
                 self.memory.add_message(
                     role="assistant",
                     content=reply_content,

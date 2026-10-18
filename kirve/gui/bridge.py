@@ -40,6 +40,10 @@ class KirveHUDBridge(QObject):
         self._last_message = self.conversational.get_time_based_startup_greeting()
         self._status_indicator = "SİSTEM ÇEVRİMİÇİ ('KİRVE' DE DİNLEYEYİM)"
         self._is_listening = False
+        self._togg_soc = 82
+        self._togg_range = 385
+        self._togg_charging = False
+        self._roborock_lidar = "Aktif"
 
         # Connect thread-safe voice listening request signal
         self.startListeningRequested.connect(self.triggerVoiceInput)

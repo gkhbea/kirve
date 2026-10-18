@@ -87,7 +87,7 @@ class TestResearchAgent(unittest.TestCase):
     def test_find_cheapest_and_open_browser(self):
         from unittest.mock import patch
         agent = ResearchAgent(headless=True)
-        with patch("webbrowser.open", return_value=True) as mock_open:
+        with patch.object(ResearchAgent, "open_in_foreground_browser", return_value=True) as mock_open:
             res = agent.find_cheapest_and_open_browser("1 kg luk nutella en ucuz nerede arastır")
             self.assertTrue(res["success"])
             self.assertEqual(res["product"], "1 kg nutella")

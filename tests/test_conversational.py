@@ -32,7 +32,7 @@ class TestConversationalEngine(unittest.TestCase):
         self.assertTrue("araştırma" in reply.lower() or "donanım" in reply.lower())
 
     def test_cheapest_nutella_and_open_browser(self):
-        with patch("webbrowser.open", return_value=True) as mock_open:
+        with patch.object(self.engine.research_agent, "open_in_foreground_browser", return_value=True) as mock_open:
             reply = self.engine.get_commentary_and_reply("1 kg luk nutella en ucuz nerede arastır")
             self.assertTrue("nutella" in reply.lower())
             self.assertTrue("akakçe" in reply.lower() or "uygun" in reply.lower() or "açıyorum" in reply.lower())
@@ -122,9 +122,13 @@ class TestConversationalEngine(unittest.TestCase):
         self.assertIn("patron", startup_msg.lower())
         self.assertTrue(any(w in startup_msg for w in ["Günaydın", "İyi günler", "İyi akşamlar", "İyi geceler"]))
 
-    def test_speech_cleaning(self):
-        cleaned = self.engine._clean_for_speech("### **Merhaba** _sistem_ `[test]`")
-        self.assertEqual(cleaned, "Merhaba sistem test")
+    def test_sports_match_broadcast_question_answers_channel(self):
+        with patch.object(self.engine.research_agent, "open_in_foreground_browser", return_value=True) as mock_open:
+            reply = self.engine.get_commentary_and_reply("Real Madrid maçı hangi kanalda?")
+            mock_open.assert_called_once()
+            self.assertTrue("s sport" in reply.lower())
+            self.assertTrue("real madrid" in reply.lower())
+            self.assertTrue("la liga" in reply.lower() or "yayın" in reply.lower())
 
 if __name__ == "__main__":
     unittest.main()

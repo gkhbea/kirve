@@ -210,9 +210,9 @@ class ConversationalEngine:
 
     def _perform_research_and_comment(self, query: str, is_direct_question: bool = False) -> str:
         """
-        Executes live Google web research, extracts factual summaries,
-        and generates thoughtful AI insights and recommendations.
-        Always opens the Google search results page directly in the user's browser in the foreground.
+        Executes live web research and broadcast guide lookups,
+        synthesizes concrete answers (channels, dates, facts),
+        and opens the search results page directly in the user's browser.
         """
         search_query = self._clean_search_query(query)
 
@@ -221,40 +221,59 @@ class ConversationalEngine:
         self.research_agent.open_in_foreground_browser(search_url)
 
         try:
-            results_dict = self.research_agent.search_web(search_query, max_results=3)
+            results_dict = self.research_agent.search_web(search_query, max_results=5)
+
+            # 1. Direct answer (e.g. Sports TV broadcasting channel, fixture, or exact match)
+            direct_ans = results_dict.get("direct_answer", "").strip()
+            if direct_ans:
+                return (
+                    f"'{search_query}' hakkında güncel bilgi şöyle patron: {direct_ans} "
+                    f"Ayrıca detayları canlı takip edebilmen için arama sayfasını da web tarayıcında hemen önüne açtım."
+                )
+
+            # 2. Extract genuine informative sentences from snippets, filtering out clickbait questions
             items = results_dict.get("results", [])
             if items:
-                snippets = []
-                for it in items[:2]:
+                informative_sents = []
+                for it in items:
                     snip = it.get("snippet", "").strip()
-                    if snip and len(snip) > 20:
-                        snippets.append(snip)
+                    for sent in re.split(r'[.!?]\s+', snip):
+                        sent = sent.strip()
+                        if not sent or len(sent) < 20 or sent.endswith("?"):
+                            continue
+                        if re.search(r'\b(hangi|nerede|ne zaman|nasıl|kaç)\s+\w+\??$', sent, re.IGNORECASE):
+                            continue
+                        if sent not in informative_sents:
+                            informative_sents.append(sent)
 
-                summary = " ".join(snippets)
-                # Shorten to 1-2 clean sentences
-                sentences = [s.strip() for s in summary.split(".") if len(s.strip()) > 15]
-                fact_text = ". ".join(sentences[:2]) + "." if sentences else summary[:180] + "."
-
-                # Thoughtful commentary based on research
-                if is_direct_question:
-                    thoughts = [
-                        f"'{search_query}' sorunu Google'da araştırdım ve arama sayfasını tarayıcında hemen önüne açtım. Elde ettiğim bilgilere göre: {fact_text} Aklına takılan başka bir detay olursa dinliyorum.",
-                        f"Sorunu Google üzerinde araştırdım ve sonuçları önüne getirdim. Öne çıkan bilgiler şöyle: {fact_text} Tarayıcından sonuçlara göz atabilirsin.",
-                        f"Google'da senin için araştırdım ve ilgili sayfayı web tarayıcında önüne getirdim. Veriler şunu gösteriyor: {fact_text} Başka bir şey öğrenmek istersen buradayım."
-                    ]
-                else:
-                    thoughts = [
-                        f"'{search_query}' konusunu araştırdım ve Google arama sayfasını tarayıcında hemen önüne açtım. Güncel bulgulara göre: {fact_text} Bana kalırsa veriler oldukça tutarlı görünüyor. İstersen bu başlığı daha derinlemesine analiz edebilirim.",
-                        f"Google üzerindeki güncel kaynakları taradım ve web sayfasını önüne getirdim. Öne çıkan bilgiler şöyle: {fact_text} Şahsi fikrim, bu durumun yakından takip edilmesi gerektiği yönünde. Ne düşünüyorsun?",
-                        f"Konuyu Google'da araştırdım ve ilgili kaynak sayfasını önüne açtım. Veriler şunu işaret ediyor: {fact_text} Bana kalırsa burada dikkat edilmesi gereken asıl nokta stratejiyi doğru kurmak. Farklı bir açıdan bakmamı ister misin?"
-                    ]
-                return random.choice(thoughts)
+                if informative_sents:
+                    fact_text = ". ".join(informative_sents[:2]) + "."
+                    if is_direct_question:
+                        thoughts = [
+                            f"Sorunu araştırdım patron; elde ettiğim bilgilere göre: {fact_text} Kaynak sayfasını da web tarayıcında hemen önüne getirdim.",
+                            f"'{search_query}' sorusunu araştırdım. Öne çıkan güncel bulgulara göre: {fact_text} Arama sayfasını da tarayıcında önüne açtım.",
+                            f"Google ve güncel kaynaklardan edindiğim verilere göre araştırdım: {fact_text} Sonuçları web tarayıcından da detaylıca inceleyebilirsin."
+                        ]
+                    else:
+                        thoughts = [
+                            f"'{search_query}' konusunu araştırdım. Güncel bulgulara göre: {fact_text} Bana kalırsa veriler oldukça tutarlı. Sayfayı da önüne açtım.",
+                            f"Konuyla ilgili güncel kaynakları araştırdım. Öne çıkan bilgiler şöyle: {fact_text} İlgili sayfayı da önüne getirdim."
+                        ]
+                    return random.choice(thoughts)
         except Exception:
             pass
 
+        # Fallback sports guide check directly if network failed
+        sports_fallback = self.research_agent.get_sports_broadcast_info(query)
+        if sports_fallback:
+            return (
+                f"'{search_query}' hakkında yayın bilgisi şöyle patron: {sports_fallback} "
+                f"Ayrıca Google arama sayfasını da tarayıcında önüne getirdim."
+            )
+
         if is_direct_question:
-            return f"'{search_query}' sorunu Google'da araştırdım ve arama sayfasını web tarayıcında hemen önüne açtım. Ekranda listelenen kaynaklardan detayları inceleyebilirsin; sormak istediğin başka bir soru varsa sendeyim."
-        return f"'{search_query}' konusunu Google'da araştırdım ve arama sayfasını web tarayıcında önüne açtım. Konuyu biraz daha açarsan sana daha net bir analiz ve fikir sunabilirim."
+            return f"'{search_query}' sorunu araştırdım ve arama sayfasını web tarayıcında hemen önüne açtım patron. Ekranda listelenen kaynaklardan detayları inceleyebilirsin."
+        return f"'{search_query}' konusunu araştırdım ve arama sayfasını web tarayıcında önüne açtım patron."
 
     def _generate_jarvis_style_reply(
         self,

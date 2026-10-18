@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['run_hud.py'],
+    ['kirve_desktop_app.py'],
     pathex=[],
     binaries=[],
-    datas=[('kirve/gui/qml/main.qml', 'kirve/gui/qml')],
-    hiddenimports=['PySide6.QtQuick', 'PySide6.QtQml', 'PySide6.QtCore', 'PySide6.QtGui', 'psutil', 'pygetwindow', 'pyttsx3', 'pyttsx3.drivers.sapi5', 'pythoncom', 'win32com.client', 'kirve.conversational', 'speech_recognition', 'pyaudio', 'edge_tts'],
+    datas=[('kirve_cockpit.html', '.')],
+    hiddenimports=['speech_recognition', 'pyaudio', 'edge_tts', 'pyttsx3', 'PySide6.QtWebEngineWidgets', 'PySide6.QtWebEngineCore'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -21,7 +21,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Kirve_AI_OS',
+    name='KIRVE_AI_OS',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -40,5 +40,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Kirve_AI_OS',
+    name='KIRVE_AI_OS',
 )
